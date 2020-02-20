@@ -21,7 +21,6 @@ public class Timer {
     private Game game;
     private Paddle player1;
     private Paddle player2;
-    private Ball ball;
 
     static long countdown = 4;
 
@@ -29,7 +28,6 @@ public class Timer {
         this.game = game;
         this.player1 = player1;
         this.player2 = player2;
-        this.ball = ball;
         startTime = System.currentTimeMillis();
         menuStartStamp = System.currentTimeMillis();
     }
@@ -65,22 +63,12 @@ public class Timer {
         //countdown(countdownStarted);
     }
 
+    /**
+     * Decrements the countdown variable by one until it's less than or equal to zero.
+     * Used when the game starts, after the player returns from the pause menu, and when a goal is scored.
+     */
     public void countdown() {
         java.util.Timer t = new java.util.Timer();
-        /*if(countdownStarted == false) {
-            //System.out.println("hi");
-            t.scheduleAtFixedRate(new TimerTask() {
-                @Override
-                public void run() {
-                    countdown--;
-                    // this if block MUST be inside the run method!!! otherwise it won't cancel!!!
-                    if(countdown <= 0) {
-                        t.cancel();
-                        t.purge();
-                    }
-                }
-            }, 0, 1000);
-        }*/
         t.scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -95,15 +83,6 @@ public class Timer {
     }
 
     public void render(Graphics g) {
-        /*if(elapsedSeconds == 11) {
-            g.drawString(elapsedSeconds - 10 + "", 50, 50);
-            g.setColor(Color.BLACK);
-        }
-        else {
-            g.drawString(elapsedSeconds + "", 50, 50);
-            g.setColor(Color.BLACK);
-        }*/
-
         g.setColor(Color.WHITE);
         g.setFont(new Font("Comic Sans MS", Font.PLAIN, 12));
         g.drawString("Time: " + (elapsedSeconds - totalSecondsInMenu), 15, 25);
@@ -116,7 +95,6 @@ public class Timer {
         else
             g.drawString(countdown + "", 500, 50);
 
-        //g.drawString(countdown + "", 500, 50);
     }
 
     public long getElapsedSeconds() {
