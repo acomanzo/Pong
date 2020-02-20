@@ -1,0 +1,61 @@
+Here i will keep track of all changes in pong. Today I came back and couldn't remember what I was working on... so
+this will be useful. I will also make several notes here.
+Remark: this program is intended to be a concept/demo of a game idea. The idea is that it will be like pong except
+the player is trying to bounce balls to hit enemies. I want it to be similar to a bullet hell game like Enter the
+Gungeon.
+
+xx/yy/zz: Make a keydown event. Rn, keypressed is getting called once, but the paddle keeps turning because degrees
+is 5 until the key is released. So, each tick it's turning 5 degrees. This mimics keydown, but only because of how I
+coded the logic to update.
+
+12/2/19: Modified Ball.java to use xPoints and yPoints array. Also worked on reflection on TurnPaddle. For the future,
+work on improving the reflection. Right now, the ball is still distorted after rotations.
+
+12/3/19: I think the ball is distorted for this reason: after we rotate the ball and paddle, when we check to see
+what part of the paddle the ball hit and then calculate the result, we do not maintain the orientation of the ball.
+If step 1 is hitting the paddle, step 2 is rotating the ball and paddle, step 3 is calculating the result, then the
+orientation of the ball is not being preserved as we move from step 2 to 3.
+
+12/7/19: I think based on the code, you should expect just a simple horizontal translation to the left after the ball
+is rotated and hit detection and before the ball and paddle are rotated to their original positions. But it's not
+a left translation. Why?
+
+12/23/19: I think part of the issue is that you're comparing an object that doesn't rotate (the ball) to an object that
+does. When you rotate the objects to their "non rotated positions" the paddle will be upright but the ball will be
+rotated relative to its "original position"
+
+1/5/20: So last time (forgot to write an update) I started writing functions for cases for when every side of the ball
+hits the paddle in a certain way. While someday I'd like to create a solution for this square ball, I think it's time
+for me to create a circle ball which may be easier to solve so that I can actually make this game.
+
+Working with the circle ball leaves me wondering if the graphics framework is sufficient. Ovals are made similarly to
+squares, and I found squares inadequate so I switched to polygons. Maybe I should juts learn C++? I'd hate to scrap
+this java project... maybe I'm not thinking creatively enough?
+
+1/8/20: I think I am on the right track with Ball.java. I think i will continue to write cases for each side of the
+ball. I added code for the cases but they might be wrong and they definitely aren't finished.
+
+1/10/20: Decided to send it with the current state of the TurnPaddle.java class... just gonna leave it unfinished and
+buggy for now so I can get to other things--tbh it's still fun even if it's not polished. Worked on making a main menu
+and pause button. When you pause the game, it pauses the ball and timer, and when you go back to the game, the timer is
+at the same time it was when you paused and the game does a little countdown before the ball goes zooming again. There
+is a bug where if the ball's speed is slow enough then the code I wrote to keep it stationary for the countdown doesn't
+really work. In the future will make an enemy type and a spawner. I'm hoping I can finish this up to be a "demo" of what
+I imagined and then someday I will make it good.
+
+1/22/20: Made classes for enemies Enemy_V and Enemy_H. The idea is that Enemy_H will spawn balls and the player will
+have to reflect the balls so that they hit the enemy, and when Enemy_H gets hit, it loses part of its health. Then, when
+Enemy_H loses all its health, the Spawner class spawns a new Enemy_V which has the same functionality as Enemy_H
+but it's rotated clockwise 90 degrees. I made those three classes but everything is really buggy right now, so I'm
+waiting to add the ball spawning functionality until those first three classes are finished. Rigght now the game isn't
+even printing the debugging messages I put in Enemy_H so idk
+
+2/7/20: Happy birthday to me! SO I fixed the bugs and they were happening because the Spawner class wasn't referencing
+the right stuff and Game class wasn't even calling its tick() method. Everything is cool now but when I added more
+functionality to the enemies they stopped working! I'm trying to get the Enemy_H to move back and forth and the the
+ENemy_V to move up and down. But it's not working!
+
+2/14/20: fixed the issue from before ^^^^^. Hit detection still very buggy. Need to add the feature where the
+enemies spawn the balls
+
+2/19/20: Added some documentation and uploaded to github.
