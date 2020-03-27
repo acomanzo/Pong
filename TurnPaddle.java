@@ -20,119 +20,121 @@ public class TurnPaddle extends GameObject {
     // since there's no KeyDown event in java that lets us keep track of the angle of rotation.
     // We add displacement up/down left/right so that we know the location of the upright position relative
     // to this paddle's current position and orientation.
-    private int [] uprightXPoints;
-    private int [] uprightYPoints;
-
-    // arrays we use to not lose data precision. [0] = top left, [1] = bottom left, [2] = bottom right, [3] = top right
-    private double[] xPoints;
-    private double[] yPoints;
-
-    // arrays we use with the native fillPolygon() class because it won't accept double.
-    int[] xInts = new int[4];
-    int[] yInts = new int[4];
+    private int [] uprightXCoordinates;
+    private int [] uprightYCoordinates;
 
     // don't use class Point because it forces you to use integer precision, which will cause the size of th e
     // paddle to shrink when you rotate it. Over time, data is lost.
     double midpointX;
     double midpointY;
 
-    public TurnPaddle(int x, int y, Game game) {
-        super(x, y);
+    public TurnPaddle(int x, int y, int width, int height, Game game, Color color) {
+        super(x, y, 0, 0, color);
         this.game = game;
 
-        xPoints = new double[]{x, x, x + WIDTH, x + WIDTH};
-        yPoints = new double[]{y, y + HEIGHT, y + HEIGHT, y};
+        makeCoordinates();
 
-        uprightXPoints = new int[]{x, x, x + WIDTH, x + WIDTH};
-        uprightYPoints = new int[]{y, y + HEIGHT, y + HEIGHT, y};
+        uprightXCoordinates = new int[]{x, x, x + WIDTH, x + WIDTH};
+        uprightYCoordinates = new int[]{y, y + HEIGHT, y + HEIGHT, y};
 
-        midpointX = (xPoints[0] + xPoints[2]) / 2;
-        midpointY = (yPoints[0] + yPoints[2]) / 2;
+        midpointX = (xCoordinates[0] + xCoordinates[2]) / 2;
+        midpointY = (yCoordinates[0] + yCoordinates[2]) / 2;
 
     }
 
-    public void tick() {
-        xPoints[0] += this.velX;
-        xPoints[1] += this.velX;
-        xPoints[2] += this.velX;
-        xPoints[3] += this.velX;
-        yPoints[0] += this.velY;
-        yPoints[1] += this.velY;
-        yPoints[2] += this.velY;
-        yPoints[3] += this.velY;
+    public void makeCoordinates() {
+        xCoordinates = new double[]{x, x, x + WIDTH, x + WIDTH};
+        yCoordinates = new double[]{y, y + HEIGHT, y + HEIGHT, y};
+    }
 
-        uprightXPoints[0] += this.velX;
-        uprightXPoints[1] += this.velX;
-        uprightXPoints[2] += this.velX;
-        uprightXPoints[3] += this.velX;
-        uprightYPoints[0] += this.velY;
-        uprightYPoints[1] += this.velY;
-        uprightYPoints[2] += this.velY;
-        uprightYPoints[3] += this.velY;
+    @Override
+    public void makeIntegerCoordinates() {
+        xInts = new int[4];
+        yInts = new int[4];
+    }
+
+    public void tick() {
+        xCoordinates[0] += this.velX;
+        xCoordinates[1] += this.velX;
+        xCoordinates[2] += this.velX;
+        xCoordinates[3] += this.velX;
+        yCoordinates[0] += this.velY;
+        yCoordinates[1] += this.velY;
+        yCoordinates[2] += this.velY;
+        yCoordinates[3] += this.velY;
+
+        uprightXCoordinates[0] += this.velX;
+        uprightXCoordinates[1] += this.velX;
+        uprightXCoordinates[2] += this.velX;
+        uprightXCoordinates[3] += this.velX;
+        uprightYCoordinates[0] += this.velY;
+        uprightYCoordinates[1] += this.velY;
+        uprightYCoordinates[2] += this.velY;
+        uprightYCoordinates[3] += this.velY;
 
         double radians = degrees * (Math.PI / 180);
 
         // rotate the top left vertex
-        double x1 = xPoints[0] - midpointX;
-        double y1 = yPoints[0] - midpointY;
+        double x1 = xCoordinates[0] - midpointX;
+        double y1 = yCoordinates[0] - midpointY;
 
         double x2 = x1 * Math.cos(radians) - y1 * Math.sin(radians);
         double y2 = x1 * Math.sin(radians) + y1 * Math.cos(radians);
 
-        xPoints[0] = x2 + midpointX;
-        yPoints[0] = y2 + midpointY;
+        xCoordinates[0] = x2 + midpointX;
+        yCoordinates[0] = y2 + midpointY;
 
         // rotate the bottom left vertex
-        x1 = xPoints[1] - midpointX;
-        y1 = yPoints[1] - midpointY;
+        x1 = xCoordinates[1] - midpointX;
+        y1 = yCoordinates[1] - midpointY;
 
         x2 = x1 * Math.cos(radians) - y1 * Math.sin(radians);
         y2 = x1 * Math.sin(radians) + y1 * Math.cos(radians);
 
-        xPoints[1] = x2 + midpointX;
-        yPoints[1] = y2 + midpointY;
+        xCoordinates[1] = x2 + midpointX;
+        yCoordinates[1] = y2 + midpointY;
 
         // rotate the bottom right vertex
-        x1 = xPoints[2] - midpointX;
-        y1 = yPoints[2] - midpointY;
+        x1 = xCoordinates[2] - midpointX;
+        y1 = yCoordinates[2] - midpointY;
 
         x2 = x1 * Math.cos(radians) - y1 * Math.sin(radians);
         y2 = x1 * Math.sin(radians) + y1 * Math.cos(radians);
 
-        xPoints[2] = x2 + midpointX;
-        yPoints[2] = y2 + midpointY;
+        xCoordinates[2] = x2 + midpointX;
+        yCoordinates[2] = y2 + midpointY;
 
         // rotate the top right vertex
-        x1 = xPoints[3] - midpointX;
-        y1 = yPoints[3] - midpointY;
+        x1 = xCoordinates[3] - midpointX;
+        y1 = yCoordinates[3] - midpointY;
 
         x2 = x1 * Math.cos(radians) - y1 * Math.sin(radians);
         y2 = x1 * Math.sin(radians) + y1 * Math.cos(radians);
 
-        xPoints[3] = x2 + midpointX;
-        yPoints[3] = y2 + midpointY;
+        xCoordinates[3] = x2 + midpointX;
+        yCoordinates[3] = y2 + midpointY;
 
         // update the midpoint
-        midpointX = (xPoints[0] + xPoints[2]) / 2;
-        midpointY = (yPoints[0] + yPoints[2]) / 2;
+        midpointX = (xCoordinates[0] + xCoordinates[2]) / 2;
+        midpointY = (yCoordinates[0] + yCoordinates[2]) / 2;
 
         // fill integer arrays so that we can use fillPolygon() in render()
-        for(int i = 0; i < xPoints.length; i++) {
-            xInts[i] = (int) xPoints[i];
+        for(int i = 0; i < xCoordinates.length; i++) {
+            xInts[i] = (int) xCoordinates[i];
         }
 
-        for(int i = 0; i < yPoints.length; i++) {
-            yInts[i] = (int) yPoints[i];
+        for(int i = 0; i < yCoordinates.length; i++) {
+            yInts[i] = (int) yCoordinates[i];
         }
 
     }
 
     public void render(Graphics g) {
-        g.setColor(Color.PINK);
+        g.setColor(color);
 
         g.fillPolygon(xInts, yInts, 4);
 
-        if(game.toggleHitboxes) {
+        if(game.toggleHitBoxes) {
             g.setColor(Color.GREEN);
 
             g.drawPolygon(xInts, yInts, 4);
@@ -149,7 +151,7 @@ public class TurnPaddle extends GameObject {
 
         // for debugging
         /*g.setColor(Color.ORANGE);
-        g.drawPolygon(uprightXPoints, uprightYPoints, 4);*/
+        g.drawPolygon(uprightXCoordinates, uprightYCoordinates, 4);*/
     }
 
     public int getHEIGHT() {
@@ -158,28 +160,6 @@ public class TurnPaddle extends GameObject {
 
     public int getWIDTH() {
         return this.WIDTH;
-    }
-
-    public double[] getxPoints() {
-        return this.xPoints;
-    }
-
-    public double[] getyPoints() {
-        return this.yPoints;
-    }
-
-    public void setxPoints(TurnPaddle turnPaddle, double x0, double x1, double x2, double x3) {
-        this.xPoints[0] = x0;
-        this.xPoints[1] = x1;
-        this.xPoints[2] = x2;
-        this.xPoints[3] = x3;
-    }
-
-    public void setyPoints(TurnPaddle turnPaddle, double y0, double y1, double y2, double y3) {
-        this.yPoints[0] = y0;
-        this.yPoints[1] = y1;
-        this.yPoints[2] = y2;
-        this.yPoints[3] = y3;
     }
 
     public double getMidpointX() {
@@ -207,15 +187,15 @@ public class TurnPaddle extends GameObject {
         // law of cosines: c^2 = a^2 + b^2 - 2abcos(theta)
 
         // get side length c (position of top left vertex to top left vertex of the upright image)
-        double c = Math.sqrt(Math.pow(xPoints[0] - uprightXPoints[0], 2) + Math.pow(yPoints[0] - uprightYPoints[0], 2));
+        double c = Math.sqrt(Math.pow(xCoordinates[0] - uprightXCoordinates[0], 2) + Math.pow(yCoordinates[0] - uprightYCoordinates[0], 2));
         //System.out.println(c);
 
         // get side length a (position of top left vertex to midpoint of the paddle)
-        double a = Math.sqrt(Math.pow(xPoints[0] - midpointX, 2) + Math.pow(yPoints[0] - midpointY, 2));
+        double a = Math.sqrt(Math.pow(xCoordinates[0] - midpointX, 2) + Math.pow(yCoordinates[0] - midpointY, 2));
         //System.out.println(a);
 
         // get side length b (upright image of top left vertex to midpoint of the paddle)
-        double b = Math.sqrt(Math.pow(uprightXPoints[0] - midpointX, 2) + Math.pow(uprightYPoints[0] - midpointY, 2));
+        double b = Math.sqrt(Math.pow(uprightXCoordinates[0] - midpointX, 2) + Math.pow(uprightYCoordinates[0] - midpointY, 2));
         //System.out.println(b);
 
         // solve for angle = arccos[(c^2 - a^2 - b^2) / -2ab]
