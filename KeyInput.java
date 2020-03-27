@@ -8,18 +8,14 @@ import java.awt.event.KeyEvent;
  */
 public class KeyInput extends KeyAdapter {
 
-    Handler handler;
-    Paddle player1;
-    Paddle player2;
-    Game game;
-    TurnPaddle turnPaddle;
+    private ClassicPaddle player1;
+    private ClassicPaddle classicModePlayer;
+    private Game game;
+    private TurnPaddle turnPaddle;
 
-    int test = 0;
-
-    public KeyInput(Handler handler, Paddle player1, Paddle player2, Game game, TurnPaddle turnPaddle) {
-        this.handler = handler;
+    public KeyInput(ClassicPaddle player1, ClassicPaddle classicModePlayer, Game game, TurnPaddle turnPaddle) {
         this.player1 = player1;
-        this.player2 = player2;
+        this.classicModePlayer = classicModePlayer;
         this.game = game;
         this.turnPaddle = turnPaddle;
     }
@@ -28,66 +24,64 @@ public class KeyInput extends KeyAdapter {
     public void keyPressed(KeyEvent e) {
         int key = e.getKeyCode();
 
-        if(key == KeyEvent.VK_W) player1.setVelY(-8);
-        if(key == KeyEvent.VK_S) player1.setVelY(8);
+        if (game.getState().equals("CRAZY_MODE")) {
+            if(key == KeyEvent.VK_W) player1.setVelY(-8);
+            if(key == KeyEvent.VK_S) player1.setVelY(8);
 
-        /*
-         * Consider using a KeyDown event to turn the paddle, because then that would streamline getting the
-         * angle of rotation.
-         */
-        if(key == KeyEvent.VK_A) {
-            turnPaddle.setDegrees(turnPaddle.getDegrees() - 5);
+            if(key == KeyEvent.VK_A) {
+                turnPaddle.setDegrees(turnPaddle.getDegrees() - 5);
+            }
+            if(key == KeyEvent.VK_D) {
+                turnPaddle.setDegrees(turnPaddle.getDegrees() + 5);
+            }
+
+            if(key == KeyEvent.VK_UP) turnPaddle.setVelY(-5);
+            if(key == KeyEvent.VK_DOWN) turnPaddle.setVelY(5);
+
+            if (key == KeyEvent.VK_LEFT) {
+                turnPaddle.setVelX(-5);
+            }
+            if (key == KeyEvent.VK_RIGHT) {
+                turnPaddle.setVelX(5);
+            }
         }
-        if(key == KeyEvent.VK_D) {
-            turnPaddle.setDegrees(turnPaddle.getDegrees() + 5);
+        else {
+            if (key == KeyEvent.VK_UP) classicModePlayer.setVelY(-5);
+            if (key == KeyEvent.VK_DOWN) classicModePlayer.setVelY(5);
         }
-
-
-        if(key == KeyEvent.VK_UP) turnPaddle.setVelY(-5);
-        if(key == KeyEvent.VK_DOWN) turnPaddle.setVelY(5);
-        //if(key == KeyEvent.VK_LEFT) player2.setVelX(-5);
-        //if(key == KeyEvent.VK_RIGHT) player2.setVelX(5);
 
         if(key == KeyEvent.VK_ESCAPE) System.exit(1);
+        if(key == KeyEvent.VK_SPACE) game.toggleHitBoxes = !game.toggleHitBoxes;
 
-        if(key == KeyEvent.VK_SPACE) game.toggleHitboxes = !game.toggleHitboxes;
-
-        if (key == KeyEvent.VK_LEFT) {
-            turnPaddle.setVelX(-5);
-        }
-        if (key == KeyEvent.VK_RIGHT) {
-            turnPaddle.setVelX(5);
-        }
     }
 
     @Override
     public void keyReleased(KeyEvent e) {
         int key = e.getKeyCode();
 
-        if(key == KeyEvent.VK_W) player1.setVelY(0);
-        if(key == KeyEvent.VK_S) player1.setVelY(0);
-        if(key == KeyEvent.VK_A) {
-            turnPaddle.setDegrees(0);
-        }
-        if(key == KeyEvent.VK_D) {
-            turnPaddle.setDegrees(0);
-        }
+        if (game.getState().equals("CRAZY_MODE")) {
+            if(key == KeyEvent.VK_W) player1.setVelY(0);
+            if(key == KeyEvent.VK_S) player1.setVelY(0);
+            if(key == KeyEvent.VK_A) {
+                turnPaddle.setDegrees(0);
+            }
+            if(key == KeyEvent.VK_D) {
+                turnPaddle.setDegrees(0);
+            }
 
-        if (key == KeyEvent.VK_LEFT) {
-            turnPaddle.setVelX(0);
-        }
-        if (key == KeyEvent.VK_RIGHT) {
-            turnPaddle.setVelX(0);
-        }
+            if (key == KeyEvent.VK_LEFT) {
+                turnPaddle.setVelX(0);
+            }
+            if (key == KeyEvent.VK_RIGHT) {
+                turnPaddle.setVelX(0);
+            }
 
-        if(key == KeyEvent.VK_UP) turnPaddle.setVelY(0);
-        if(key == KeyEvent.VK_DOWN) turnPaddle.setVelY(0);
-        //if(key == KeyEvent.VK_LEFT) player2.setVelX(0);
-        //if(key == KeyEvent.VK_RIGHT) player2.setVelX(0);
-    }
-
-    public void keyDown(KeyEvent e) {
-        test++;
-        System.out.println(test);
+            if(key == KeyEvent.VK_UP) turnPaddle.setVelY(0);
+            if(key == KeyEvent.VK_DOWN) turnPaddle.setVelY(0);
+        }
+        else {
+            if (key == KeyEvent.VK_UP) classicModePlayer.setVelY(0);
+            if(key == KeyEvent.VK_DOWN) classicModePlayer.setVelY(0);
+        }
     }
 }
