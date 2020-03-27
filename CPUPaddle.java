@@ -13,26 +13,35 @@ public class CPUPaddle extends GameObject {
 
     int velY = 5;
 
-    int[] xPoints1;
-    int[] yPoints1;
-
     Point centerPoint;
 
-    public CPUPaddle(int x, int y, Game game) {
-        super(x, y);
+    public CPUPaddle(int x, int y, int width, int height, Game game, Color color) {
+        super(x, y, 0, 0, color);
 
         this.game = game;
+
+        makeIntegerCoordinates();
 
         centerPoint = new Point((x + x + WIDTH) / 2, (y + y + HEIGHT) / 2);
     }
 
+    public void makeCoordinates() {
+        xCoordinates = new double[]{x, x, x + WIDTH, x + WIDTH};
+        yCoordinates = new double[]{y, y + HEIGHT, y + HEIGHT, y};
+    }
+
+    public void makeIntegerCoordinates() {
+        xInts = new int[]{x, x, x + WIDTH, x + WIDTH};
+        yInts = new int[]{y, y + HEIGHT, y + HEIGHT, y};
+    }
+
     public void tick() {
 
-        if(y < (game.getBall().getyPoints())[0]) {
+        if(y < (game.getBall(game.getState()).getYCoordinates())[0]) {
             y += velY;
         }
 
-        if(y > (game.getBall().getyPoints())[0]) {
+        if(y > (game.getBall(game.getState()).getYCoordinates())[0]) {
             y = y - 5;
         }
 
@@ -44,10 +53,10 @@ public class CPUPaddle extends GameObject {
     }
 
     public void render(Graphics g) {
-        g.setColor(Color.WHITE);
+        g.setColor(color);
         g.fillRect(x, y, WIDTH, HEIGHT);
 
-        if(game.toggleHitboxes) {
+        if(game.toggleHitBoxes) {
             g.setColor(Color.GREEN);
 
             g.drawRect(x, y, WIDTH, 40);
@@ -97,7 +106,7 @@ public class CPUPaddle extends GameObject {
      * @return the mid point of the top right and bottom right vertices of this paddle.
      */
     public Point getRightMidPoint() {
-        return new Point((xPoints1[2] + xPoints1[3]) / 2, (yPoints1[2] + yPoints1[3]) / 2);
+        return new Point((xInts[2] + xInts[3]) / 2, (yInts[2] + yInts[3]) / 2);
     }
 
     /**
