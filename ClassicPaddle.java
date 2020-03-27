@@ -3,21 +3,31 @@ package com.main;
 import java.awt.*;
 
 /**
- * Represents a paddle that cannot rotate. Think of the traditionally pong paddle.
+ * Represents a traditional Pong paddle.
  */
-public class Paddle extends GameObject {
+public class ClassicPaddle extends GameObject {
 
-    final int HEIGHT = 100;
-    final int WIDTH = 20;
-    Game game;
+    private int HEIGHT;
+    private int WIDTH;
+    private Game game;
 
-    int[] xPoints1;
-    int[] yPoints1;
+    public ClassicPaddle(int x, int y, int width, int height, Game game, Color color) {
+        super(x, y, 0, 0, color);
 
-    public Paddle(int x, int y, Game game) {
-        super(x, y);
-
+        this.WIDTH = width;
+        this.HEIGHT = height;
+        makeCoordinates();
         this.game = game;
+    }
+
+    public void makeCoordinates() {
+        xCoordinates = new double[]{x, x, x + WIDTH, x + WIDTH};
+        yCoordinates = new double[]{y, y + HEIGHT, y + HEIGHT, y};
+    }
+
+    public void makeIntegerCoordinates() {
+        xInts = new int[]{x, x, x + WIDTH, x + WIDTH};
+        yInts = new int[]{y, y + HEIGHT, y + HEIGHT, y};
     }
 
     public void tick() {
@@ -51,10 +61,10 @@ public class Paddle extends GameObject {
     }
 
     public void render(Graphics g) {
-        g.setColor(Color.BLACK);
+        g.setColor(color);
         g.fillRect(x, y, WIDTH, HEIGHT);
 
-        if(game.toggleHitboxes) {
+        if(game.toggleHitBoxes) {
             g.setColor(Color.GREEN);
 
             g.drawRect(x, y, WIDTH, 40);
@@ -83,7 +93,6 @@ public class Paddle extends GameObject {
      * @return the mid point of the top right and bottom right vertices of this paddle.
      */
     public Point getRightMidPoint() {
-        //return new Point((xPoints1[2] + xPoints1[3]) / 2, (yPoints1[2] + yPoints1[3]) / 2);
         return new Point((x + this.WIDTH + x + this.WIDTH) / 2, (y + this.HEIGHT + y) / 2);
     }
 
@@ -92,6 +101,6 @@ public class Paddle extends GameObject {
      * @return the mid point of the top left and bottom left vertices of this paddle.
      */
     public Point getLeftMidPoint() {
-        return new Point((xPoints1[0] + xPoints1[1]) / 2, (yPoints1[0] + yPoints1[1]) / 2);
+        return new Point((xInts[0] + xInts[1]) / 2, (yInts[0] + yInts[1]) / 2);
     }
 }
