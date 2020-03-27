@@ -16,12 +16,22 @@ public class Trail extends GameObject {
     // life = 0.01 - 0.1. smaller the life, the longer the particle
 
     public Trail(int x, int y, Color color, int width, int height, float life, Handler handler) {
-        super(x, y);
+        super(x, y, 0, 0, color);
         this.color = color;
         this.width = width;
         this.height = height;
         this.life = life;
         this.handler = handler;
+    }
+
+    @Override
+    public void makeCoordinates() {
+
+    }
+
+    @Override
+    public void makeIntegerCoordinates() {
+
     }
 
     public void tick() {
