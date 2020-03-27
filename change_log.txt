@@ -4,28 +4,28 @@ Remark: this program is intended to be a concept/demo of a game idea. The idea i
 the player is trying to bounce balls to hit enemies. I want it to be similar to a bullet hell game like Enter the
 Gungeon.
 
-xx/yy/zz: Make a keydown event. Rn, keypressed is getting called once, but the paddle keeps turning because degrees
+xx/yy/zz: Make a keydown event. Rn, keypressed is getting called once, but the classicPaddle keeps turning because degrees
 is 5 until the key is released. So, each tick it's turning 5 degrees. This mimics keydown, but only because of how I
 coded the logic to update.
 
 12/2/19: Modified Ball.java to use xPoints and yPoints array. Also worked on reflection on TurnPaddle. For the future,
 work on improving the reflection. Right now, the ball is still distorted after rotations.
 
-12/3/19: I think the ball is distorted for this reason: after we rotate the ball and paddle, when we check to see
-what part of the paddle the ball hit and then calculate the result, we do not maintain the orientation of the ball.
-If step 1 is hitting the paddle, step 2 is rotating the ball and paddle, step 3 is calculating the result, then the
+12/3/19: I think the ball is distorted for this reason: after we rotate the ball and classicPaddle, when we check to see
+what part of the classicPaddle the ball hit and then calculate the result, we do not maintain the orientation of the ball.
+If step 1 is hitting the classicPaddle, step 2 is rotating the ball and classicPaddle, step 3 is calculating the result, then the
 orientation of the ball is not being preserved as we move from step 2 to 3.
 
 12/7/19: I think based on the code, you should expect just a simple horizontal translation to the left after the ball
-is rotated and hit detection and before the ball and paddle are rotated to their original positions. But it's not
+is rotated and hit detection and before the ball and classicPaddle are rotated to their original positions. But it's not
 a left translation. Why?
 
 12/23/19: I think part of the issue is that you're comparing an object that doesn't rotate (the ball) to an object that
-does. When you rotate the objects to their "non rotated positions" the paddle will be upright but the ball will be
+does. When you rotate the objects to their "non rotated positions" the classicPaddle will be upright but the ball will be
 rotated relative to its "original position"
 
 1/5/20: So last time (forgot to write an update) I started writing functions for cases for when every side of the ball
-hits the paddle in a certain way. While someday I'd like to create a solution for this square ball, I think it's time
+hits the classicPaddle in a certain way. While someday I'd like to create a solution for this square ball, I think it's time
 for me to create a circle ball which may be easier to solve so that I can actually make this game.
 
 Working with the circle ball leaves me wondering if the graphics framework is sufficient. Ovals are made similarly to
@@ -59,3 +59,56 @@ ENemy_V to move up and down. But it's not working!
 enemies spawn the balls
 
 2/19/20: Added some documentation and uploaded to github.
+
+3/26/20:
+public void tick (boolean countdownStarted) {
+
+        if (!game.getState().equals(mode) && !offsetOn) {
+            offsetStartTime = System.currentTimeMillis();
+            offsetOn = true;
+        }
+
+        if (offsetOn) {
+            long elapsedOffset = System.currentTimeMillis() - offsetStartTime;
+            elapsedSecondsOffset = elapsedOffset / 1000;
+        }
+
+        if (game.getState().equals(mode) && offsetOn) {
+            offsetStartTime = 0;
+            offsetOn = false;
+            elapsedSecondsOffsetTotal += elapsedSecondsOffset;
+        }
+
+        long elapsedTime = System.currentTimeMillis() - startTime;
+        elapsedSeconds = (elapsedTime / 1000) - elapsedSecondsOffsetTotal;
+        //elapsedSeconds = (elapsedTime / 1000);
+
+        if(!countdownStarted && game.getState().equals(mode)) {
+            countdown();
+        }
+    }
+
+Maybe when I reflect the ball off the turn classicPaddle, I need to get the angle based on the vector the ball is moving
+at, where velX is the x component and velY is the y component?
+
+3/27/20: Did a lot of refactoring, namely renaming functions/variables from something like xPoints/yPoints to
+xCoordinates/yCoordinates. Mostly worked on housekeeping--made classes more abstract, namely the subclasses of
+GameObject. GameObject could be better used so I wanted to do that. I also added the ability to render the GameObjects
+in a particular color determined when they are constructed (I added a color field to GameObject). Most notable perhaps,
+I added an additional game mode called Classic Pong so I can at least show I'm not all that stupid and can make
+regular pong :p In order to do this I added a "state machine" of sorts in Game.java that will call the right tick()
+and render() methods accordingly. I also make separate objects for each mode i.e. each mode has its own balls, paddles,
+and so on. I added a new box in the menu screen to reflect this. Also, I made Ball.java take an ArrayList of GameObjects
+so that each ball will know which GameObjects to interact with. I also added new color palettes to the main menu and
+both modes. I also cleaned up my code by removing unused pieces of code and comments. Another big update is in Timer.
+I removed the function where when the user pauses the game the timer pauses. This wasn't a perfect function, and
+it's not that important, so I decided to remove it until I can figure out how to make it work how I want it to. Also,
+although there are two timers (one for each mode), they will show the same time in the HUD.
+
+Bugs: 1) switching between the two modes will cause the timer to render an error on screen; and 2) the Ball-TurnPaddle
+collision detection is still imperfect. I am trying to figure out how to bounce a ball off walls at arbitrary angles.
+You can see above in yesterday's notes I was thinking about it a little. I ended up emailing two of my professors at
+college for help: I emailed my linear algebra professor to inquire about a matrix solution and my mechanics professor
+from last semester to get his perspective. My linear professor guided me towards a chapter in my textbook that might
+help and my mechanics professor said the problem is very hard. I have yet to respond to them and haven't thought about
+what they've said very much yet.
