@@ -19,36 +19,38 @@ public class HUD extends MouseAdapter {
     private int my;
 
     private int player1Score;
-    private int player2Score;
+    private int cpuScore;
 
     private Game game;
     private Timer timer;
     private Ball ball;
 
-    public HUD(int x, int y, Game game, Timer timer, Ball ball) {
+    private Color color;
+
+    public HUD(int x, int y, Game game, Timer timer, Ball ball, Color color) {
         this.x = x;
         this.y = y;
         this.game = game;
         this.timer = timer;
         this.ball = ball;
+        this.color = color;
     }
 
-    public void tick(int player1Score, int player2Score) {
+    public void tick(int player1Score, int cpuScore) {
         this.player1Score = player1Score;
-        this.player2Score = player2Score;
+        this.cpuScore = cpuScore;
 
         mx = 0;
         my = 0;
     }
 
     public void render(Graphics g) {
-        g.setColor(Color.BLACK);
+        g.setColor(color);
         g.drawRect(x, y, WIDTH, HEIGHT);
 
-        g.setColor(Color.WHITE);
         g.setFont(new Font("Comic Sans MS", Font.PLAIN, 12));
         g.drawString("Player 1 Score: " + player1Score, x + 10, y + 45);
-        g.drawString("Player 2 Score: " + player2Score, x + 10, y + 70);
+        g.drawString("CPU Score: " + cpuScore, x + 10, y + 70);
 
         g.drawRect(x + 10, y + 95, 50, 30);
         g.drawString("Pause", x + 15, y + 115);
