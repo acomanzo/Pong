@@ -22,7 +22,7 @@ public class Ball extends GameObject {
 
     public Ball(int x, int y, int width, int height, Timer timer, Handler handler, Game game, ArrayList<GameObject> gameObjects, Color color) {
         super(x, y, 4, -2, color);
-        
+
         this.WIDTH = width;
         this.HEIGHT = height;
         this.timer = timer;
@@ -535,7 +535,7 @@ public class Ball extends GameObject {
                 this.yCoordinates[2] = paddleYCoordinates[0];
                 this.yCoordinates[3] = paddleYCoordinates[0] + this.HEIGHT;
                 speedBoost++;
-                System.out.println("bottom to head");
+                System.out.println("Ball bottom to paddle head");
             }
             // case 1.2: right side of the ball hits the head
             else if (this.yCoordinates[2] > paddleYCoordinates[0] &&
@@ -549,7 +549,7 @@ public class Ball extends GameObject {
                 this.yCoordinates[0] = paddleYCoordinates[0] + this.HEIGHT;
                 this.yCoordinates[1] = paddleYCoordinates[0] + this.HEIGHT;
                 speedBoost++;
-                System.out.println("right to head");
+                System.out.println("Ball right to paddle head");
             }
             // case 1.3: top of the ball hits the head
             else if (this.yCoordinates[0] > paddleYCoordinates[0] &&
@@ -562,7 +562,7 @@ public class Ball extends GameObject {
                 this.yCoordinates[1] = paddleYCoordinates[0] + this.HEIGHT;
                 this.yCoordinates[2] = paddleYCoordinates[0] + this.HEIGHT;
                 speedBoost++;
-                System.out.println("top to head");
+                System.out.println("Ball top to paddle head");
             }
             // case 1.4: left side of the ball hits the head
             else if (this.yCoordinates[0] > paddleYCoordinates[0] &&
@@ -576,7 +576,7 @@ public class Ball extends GameObject {
                 this.yCoordinates[2] = paddleYCoordinates[0] + this.HEIGHT;
                 this.yCoordinates[3] = paddleYCoordinates[0] + this.HEIGHT;
                 speedBoost++;
-                System.out.println("left to head");
+                System.out.println("Ball left to paddle head");
             }
 
             // "tail" of the paddle
@@ -591,7 +591,7 @@ public class Ball extends GameObject {
                 this.yCoordinates[2] = paddleYCoordinates[0] + turnPaddle.getHEIGHT() + this.HEIGHT;
                 this.yCoordinates[3] = paddleYCoordinates[0] + turnPaddle.getHEIGHT();
                 speedBoost++;
-                System.out.println("top to tail");
+                System.out.println("Ball top to paddle tail");
             }
             // case 2.2: right side of the ball hits the tail
             else if (this.yCoordinates[2] > paddleYCoordinates[0] &&
@@ -605,9 +605,20 @@ public class Ball extends GameObject {
                 this.yCoordinates[0] = paddleYCoordinates[0] + this.HEIGHT;
                 this.yCoordinates[1] = paddleYCoordinates[0] + this.HEIGHT;
                 speedBoost++;
-                System.out.println("right to head");
+                System.out.println("Ball right to paddle head");
             }
             // case 2.3: bottom of the ball hits the tail
+            else if (this.yCoordinates[1] < paddleYCoordinates[1] &&
+                    this.yCoordinates[1] > paddleYCoordinates[1] - 10 &&
+                    this.xCoordinates[1] < paddleXCoordinates[2] + 10 &&
+                    this.xCoordinates[2] > paddleXCoordinates[1] - 10) {
+                this.velY = -this.velY;
+                this.yCoordinates[0] = paddleYCoordinates[1] + HEIGHT;
+                this.yCoordinates[1] = paddleYCoordinates[1];
+                this.yCoordinates[2] = paddleYCoordinates[1];
+                this.yCoordinates[4] = paddleYCoordinates[1] + HEIGHT;
+                System.out.println("Ball bottom to paddle tail");
+            }
 
             // case 2.4: left side of the ball hits the tail
             else if (this.yCoordinates[0] < paddleYCoordinates[1] &&
@@ -621,19 +632,23 @@ public class Ball extends GameObject {
                 this.yCoordinates[2] = paddleYCoordinates[1] + this.HEIGHT;
                 this.yCoordinates[3] = paddleYCoordinates[1] + this.HEIGHT;
                 speedBoost++;
-                System.out.println("left to head");
+                System.out.println("Ball left to Paddle head");
             }
 
             // case 3.1: top of ball hits left side of paddle
             else if (this.xCoordinates[0] > paddleXCoordinates[0] && this.xCoordinates[0] < (paddleXCoordinates[0] + turnPaddle.getWIDTH()) &&
                     this.yCoordinates[0] > paddleYCoordinates[0] && this.yCoordinates[0] < (paddleYCoordinates[0] + turnPaddle.getHEIGHT())) {
                 this.velY = -this.velY;
-                System.out.println("Top to left");
+                this.xCoordinates[0] = paddleXCoordinates[0];
+                this.xCoordinates[1] = paddleXCoordinates[0] - WIDTH;
+                this.xCoordinates[2] = paddleXCoordinates[0] - WIDTH;
+                this.xCoordinates[3] = paddleXCoordinates[0];
+                System.out.println("Ball Top to Paddle left");
             }
 
             // case 3.2: right side of the ball hits left side of paddle
             // case 3.2.1: middle of paddle
-            if((this.xCoordinates[0] + this.WIDTH < paddleXCoordinates[0] + turnPaddle.getWIDTH()) &&
+            else if((this.xCoordinates[0] + this.WIDTH < paddleXCoordinates[0] + turnPaddle.getWIDTH()) &&
                     (this.xCoordinates[0] + this.WIDTH > paddleXCoordinates[0]) &&
                     (this.yCoordinates[0] > (((paddleYCoordinates[0] + paddleYCoordinates[1]) / 2 ) - 10)) &&
                     (this.yCoordinates[0] < (((paddleYCoordinates[0] + paddleYCoordinates[1]) / 2 ) + 10))) {
@@ -645,7 +660,7 @@ public class Ball extends GameObject {
                 this.xCoordinates[2] = paddleXCoordinates[0];
                 this.xCoordinates[3] = paddleXCoordinates[0];
                 speedBoost++;
-                System.out.println("Middle");
+                System.out.println("Ball right to paddle Middle");
             }
 
             // case 3.2.2: bottom half of paddle
@@ -661,7 +676,7 @@ public class Ball extends GameObject {
                 this.xCoordinates[2] = paddleXCoordinates[0];
                 this.xCoordinates[3] = paddleXCoordinates[0];
                 speedBoost++;
-                System.out.println("bottom");
+                System.out.println("Ball right to paddle bottom half");
             }
 
             // case 3.2.3: top half of paddle
@@ -677,49 +692,73 @@ public class Ball extends GameObject {
                 this.xCoordinates[2] = paddleXCoordinates[0];
                 this.xCoordinates[3] = paddleXCoordinates[0];
                 speedBoost++;
-                System.out.println("Top");
+                System.out.println("Ball right top half");
             }
 
             // case 3.3: bottom of the ball hits the left side of paddle
             else if (this.xCoordinates[1] > paddleXCoordinates[0] && this.xCoordinates[1] < (paddleXCoordinates[0] + turnPaddle.getWIDTH()) &&
                     this.yCoordinates[2] > paddleYCoordinates[0] && this.yCoordinates[1] < (paddleYCoordinates[0] + turnPaddle.getHEIGHT())) {
                 this.velY = -this.velY;
-                System.out.println("bottom to left");
+                this.xCoordinates[0] = paddleXCoordinates[2] + WIDTH;
+                this.xCoordinates[1] = paddleXCoordinates[2];
+                this.xCoordinates[2] = paddleXCoordinates[2];
+                this.xCoordinates[3] = paddleXCoordinates[2] + WIDTH;
+                System.out.println("Ball bottom to paddle left");
             }
 
             // case 3.4: left side of the ball hits the left side of paddle
             else if (this.xCoordinates[0] > paddleXCoordinates[0] && this.xCoordinates[0] < (paddleXCoordinates[0] + turnPaddle.getWIDTH()) &&
                     this.yCoordinates[0] > paddleYCoordinates[0] && this.yCoordinates[0] < (paddleYCoordinates[0] + turnPaddle.getHEIGHT())) {
                 this.velX = -this.velX;
-                System.out.println("left to left");
+                this.xCoordinates[0] = paddleXCoordinates[0];
+                this.xCoordinates[1] = paddleXCoordinates[0];
+                this.xCoordinates[2] = paddleXCoordinates[0] + WIDTH;
+                this.xCoordinates[3] = paddleXCoordinates[0] + WIDTH;
+                System.out.println("Ball left to paddle left");
             }
 
             // case 4.1: top of ball hits right side of paddle
             else if (this.xCoordinates[0] < paddleXCoordinates[0] + turnPaddle.getWIDTH() && this.xCoordinates[0] > paddleXCoordinates[0] &&
                     this.yCoordinates[3] > paddleYCoordinates[0] && this.yCoordinates[0] < paddleYCoordinates[0] + turnPaddle.getHEIGHT()) {
                 this.velY = -this.velY;
-                System.out.println("Top to right");
+                this.xCoordinates[0] = paddleXCoordinates[0];
+                this.xCoordinates[1] = paddleXCoordinates[0] - WIDTH;
+                this.xCoordinates[2] = paddleXCoordinates[0] - WIDTH;
+                this.xCoordinates[3] = paddleXCoordinates[0];
+                System.out.println("Ball Top to paddle right");
             }
 
             // case 4.2: right side of the ball hits right side of paddle
             else if (this.xCoordinates[2] < paddleXCoordinates[0] + turnPaddle.getWIDTH() && this.xCoordinates[2] > paddleXCoordinates[0] &&
                     this.yCoordinates[2] > paddleYCoordinates[0] && this.yCoordinates[2] < paddleYCoordinates[0] + turnPaddle.getHEIGHT()) {
                 this.velX = -this.velX;
-                System.out.println("Right to right");
+                this.xCoordinates[0] = paddleXCoordinates[0] - WIDTH;
+                this.xCoordinates[1] = paddleXCoordinates[0] - WIDTH;
+                this.xCoordinates[2] = paddleXCoordinates[0];
+                this.xCoordinates[3] = paddleXCoordinates[0];
+                System.out.println("Ball Right to paddle right");
             }
 
             // case 4.3: bottom of the ball hits the right side of paddle
             else if (this.xCoordinates[1] < paddleXCoordinates[0] + turnPaddle.getWIDTH() && this.xCoordinates[1] > paddleXCoordinates[0] &&
                     this.yCoordinates[1] > paddleYCoordinates[0] && this.yCoordinates[1] < paddleYCoordinates[0] + turnPaddle.getHEIGHT()) {
                 this.velY = -this.velY;
-                System.out.println("Bottom to right");
+                this.xCoordinates[0] = paddleXCoordinates[0] - WIDTH;
+                this.xCoordinates[1] = paddleXCoordinates[0];
+                this.xCoordinates[2] = paddleXCoordinates[0];
+                this.xCoordinates[3] = paddleXCoordinates[0] - WIDTH;
+                System.out.println("Ball Bottom to paddle right");
             }
 
             // case 4.4: left side of the ball hits the right side of paddle
             else if (this.xCoordinates[0] < paddleXCoordinates[0] + turnPaddle.getWIDTH() && this.xCoordinates[0] > paddleXCoordinates[0] &&
                     this.yCoordinates[0] > paddleYCoordinates[0] && this.yCoordinates[1] < paddleYCoordinates[0] + turnPaddle.getHEIGHT()) {
                 this.velX = -this.velX;
-                System.out.println("left to right");
+                this.xCoordinates[0] = paddleXCoordinates[0];
+                this.xCoordinates[1] = paddleXCoordinates[0] - WIDTH;
+                this.xCoordinates[2] = paddleXCoordinates[0] - WIDTH;
+                this.xCoordinates[3] = paddleXCoordinates[0];
+                System.out.println("Ball left to paddle right");
             }
 
             // put the everything back to where it should be
