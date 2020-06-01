@@ -3,6 +3,7 @@ package com.main;
 import java.awt.*;
 import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class Game extends Canvas implements Runnable {
 
@@ -15,7 +16,7 @@ public class Game extends Canvas implements Runnable {
     private Handler crazyModeHandler;
     private Handler classicModeHandler;
 
-    private Spawner spawner;
+    private SpawnerManager spawnerManager;
 
     private Menu menu;
 
@@ -48,6 +49,9 @@ public class Game extends Canvas implements Runnable {
 
     private String state = "MAIN MENU";
 
+    private CollisionManager crazyModeCollisionManager;
+    private CollisionManager classicModeCollisionManager;
+
     /**
      * Initializes several variables crucial to the game and adds game objects to the handler.
      */
@@ -72,31 +76,46 @@ public class Game extends Canvas implements Runnable {
 
         crazyModeHandler = new Handler();
 
-        player1 = new ClassicPaddle(50, Math.round(HEIGHT / 2 - 50), 20, 100, this, myTeal);
-        turnPaddle = new TurnPaddle(750, 200, 20, 100, this, salmon);
-        cpuPaddle = new CPUPaddle(930, HEIGHT / 2 - 50, 20, 100, this, darkBlue);
+        crazyModeCollisionManager = new CollisionManager();
+
+        player1 = new ClassicPaddle(50, Math.round(HEIGHT / 2 - 50), 20, 100, this, myTeal, String.valueOf(System.currentTimeMillis() * ThreadLocalRandom.current().nextInt(1, 1000 + 1)));
+        turnPaddle = new TurnPaddle(750, 200, 20, 100, this, salmon, String.valueOf(System.currentTimeMillis() * ThreadLocalRandom.current().nextInt(1, 1000 + 1)));
+        cpuPaddle = new CPUPaddle(930, HEIGHT / 2 - 50, 20, 100, this, darkBlue, String.valueOf(System.currentTimeMillis() * ThreadLocalRandom.current().nextInt(1, 1000 + 1)));
 
         crazyModeTimer = new Timer(this, "CRAZY_MODE", darkBlue);
 
-        ArrayList<GameObject> gameObjects = new ArrayList<>();
+        ArrayList<SimpleGameObject> gameObjects = new ArrayList<>();
         gameObjects.add(player1);
         gameObjects.add(turnPaddle);
         gameObjects.add(cpuPaddle);
-        crazyModeBall = new Ball(WIDTH / 2 - 10, HEIGHT / 2 - 10, 20, 20, crazyModeTimer, crazyModeHandler, this, gameObjects, myRed);
+        crazyModeBall = new Ball(WIDTH / 2 - 10, HEIGHT / 2 - 10, 20, 20, crazyModeTimer, crazyModeHandler, this, myRed, String.valueOf(System.currentTimeMillis() * ThreadLocalRandom.current().nextInt(1, 1000 + 1)));
 
         HUD = new HUD(5, 5, this, crazyModeTimer, crazyModeBall, darkBlue);
         this.addMouseListener(HUD);
 
-        enemy_h = new Enemy_H(600, 100, 80, 100, crazyModeBall, Color.BLACK);
-        enemy_v = new Enemy_V(600, 100, 80, 100, crazyModeBall, Color.BLACK);
+        spawnerManager = new SpawnerManager(crazyModeHandler, HUD, crazyModeTimer, this, null);
 
-        spawner = new Spawner(crazyModeHandler, HUD, crazyModeTimer, enemy_h, enemy_v, crazyModeBall);
+        enemy_h = new Enemy_H(WIDTH / 2, 100, 2, 0, 100, 50, Color.BLACK, String.valueOf(System.currentTimeMillis() * ThreadLocalRandom.current().nextInt(1, 1000 + 1)), spawnerManager);
+        enemy_v = new Enemy_V(600, 200, 0, 2, 50, 100, Color.BLACK, String.valueOf(System.currentTimeMillis() * ThreadLocalRandom.current().nextInt(1, 1000 + 1)), spawnerManager);
 
-        crazyModeHandler.addObject(player1);
-        crazyModeHandler.addObject(turnPaddle);
-        crazyModeHandler.addObject(crazyModeBall);
-        crazyModeHandler.addObject(cpuPaddle);
-        crazyModeHandler.addObject(enemy_h);
+        spawnerManager.setBall(crazyModeBall);
+        spawnerManager.setEnemy_h(enemy_h);
+        spawnerManager.setEnemy_v(enemy_v);
+
+        crazyModeHandler.addObject(player1.getId(), player1);
+        crazyModeHandler.addObject(turnPaddle.getId(), turnPaddle);
+        crazyModeHandler.addObject(crazyModeBall.getId(), crazyModeBall);
+        crazyModeHandler.addObject(cpuPaddle.getId(), cpuPaddle);
+        crazyModeHandler.addObject(enemy_h.getId(), enemy_h);
+
+        crazyModeCollisionManager.add(crazyModeBall);
+        crazyModeCollisionManager.add(player1);
+        crazyModeCollisionManager.add(turnPaddle);
+        crazyModeCollisionManager.add(cpuPaddle);
+        crazyModeCollisionManager.add(enemy_h);
+        crazyModeCollisionManager.add(enemy_v);
+
+        spawnerManager.setCollisionManager(crazyModeCollisionManager);
     }
 
     private void makeClassicMode() {
@@ -108,21 +127,26 @@ public class Game extends Canvas implements Runnable {
 
         classicModeHandler = new Handler();
 
-        classicModeCpu = new CPUPaddle(930, HEIGHT / 2 - 50, 20, 100, this, myBlue);
-        classicModePlayer = new ClassicPaddle(50, Math.round(HEIGHT / 2 - 50), 20, 100, this, myBlue);
+        classicModeCollisionManager = new CollisionManager();
+
+        classicModeCpu = new CPUPaddle(930, HEIGHT / 2 - 50, 20, 100, this, myBlue, String.valueOf(System.currentTimeMillis() * ThreadLocalRandom.current().nextInt(1, 1000 + 1)));
+        classicModePlayer = new ClassicPaddle(50, Math.round(HEIGHT / 2 - 50), 20, 100, this, myBlue, String.valueOf(System.currentTimeMillis() * ThreadLocalRandom.current().nextInt(1, 1000 + 1)));
         classicModeTimer = new Timer(this, "CLASSIC_MODE", myDarkBlue);
-        ArrayList<GameObject> gameObjects = new ArrayList<>();
+        ArrayList<SimpleGameObject> gameObjects = new ArrayList<>();
         gameObjects.add(classicModeCpu);
         gameObjects.add(classicModePlayer);
-        classicModeBall = new Ball(WIDTH / 2 - 10, HEIGHT / 2 - 10, 20, 20, classicModeTimer, classicModeHandler, this, gameObjects, myGold);
+        classicModeBall = new Ball(WIDTH / 2 - 10, HEIGHT / 2 - 10, 20, 20, classicModeTimer, classicModeHandler, this, myGold, String.valueOf(System.currentTimeMillis() * ThreadLocalRandom.current().nextInt(1, 1000 + 1)));
 
         HUD = new HUD(5, 5, this, crazyModeTimer, crazyModeBall, myRed);
         this.addMouseListener(HUD);
 
-        classicModeHandler.addObject(classicModePlayer);
-        classicModeHandler.addObject(classicModeBall);
-        classicModeHandler.addObject(classicModePlayer);
-        classicModeHandler.addObject(classicModeCpu);
+        classicModeHandler.addObject(classicModePlayer.getId(), classicModePlayer);
+        classicModeHandler.addObject(classicModeBall.getId(), classicModeBall);
+        classicModeHandler.addObject(classicModeCpu.getId(), classicModeCpu);
+
+        classicModeCollisionManager.add(classicModeBall);
+        classicModeCollisionManager.add(classicModePlayer);
+        classicModeCollisionManager.add(classicModeCpu);
     }
 
     public synchronized void start() {
@@ -175,8 +199,9 @@ public class Game extends Canvas implements Runnable {
             crazyModeHandler.tick();
             crazyModeTimer.tick(crazyModeCountdownStarted);
             crazyModeCountdownStarted = true;
-            spawner.tick();
+            spawnerManager.tick();
             HUD.tick(playerScore, cpuScore);
+            crazyModeCollisionManager.tick();
         }
         else if (state.equals("CLASSIC_MODE")) {
             classicModeHandler.tick();
@@ -184,6 +209,7 @@ public class Game extends Canvas implements Runnable {
             classicModeCountdownStarted = true;
             crazyModeTimer.tick(crazyModeCountdownStarted);
             HUD.tick(playerScore, cpuScore);
+            classicModeCollisionManager.tick();
         }
         else if (state.equals("MAIN MENU")) {
             menu.tick();
@@ -305,4 +331,5 @@ public class Game extends Canvas implements Runnable {
     public void setPauseCrazyModeBall(boolean pauseCrazyModeBall) {
         this.pauseCrazyModeBall = pauseCrazyModeBall;
     }
+
 }

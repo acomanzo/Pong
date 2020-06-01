@@ -29,10 +29,10 @@ public class KeyInput extends KeyAdapter {
             if(key == KeyEvent.VK_S) player1.setVelY(8);
 
             if(key == KeyEvent.VK_A) {
-                turnPaddle.setDegrees(turnPaddle.getDegrees() - 5);
+                turnPaddle.decrementDegrees();
             }
             if(key == KeyEvent.VK_D) {
-                turnPaddle.setDegrees(turnPaddle.getDegrees() + 5);
+                turnPaddle.incrementDegrees();
             }
 
             if(key == KeyEvent.VK_UP) turnPaddle.setVelY(-5);
@@ -62,12 +62,6 @@ public class KeyInput extends KeyAdapter {
         if (game.getState().equals("CRAZY_MODE")) {
             if(key == KeyEvent.VK_W) player1.setVelY(0);
             if(key == KeyEvent.VK_S) player1.setVelY(0);
-            if(key == KeyEvent.VK_A) {
-                turnPaddle.setDegrees(0);
-            }
-            if(key == KeyEvent.VK_D) {
-                turnPaddle.setDegrees(0);
-            }
 
             if (key == KeyEvent.VK_LEFT) {
                 turnPaddle.setVelX(0);

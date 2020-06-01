@@ -1,15 +1,14 @@
 package com.main;
 
 import java.awt.*;
+import java.awt.geom.Point2D;
+import java.util.TimerTask;
 
 /**
- * Represents an enemy that moves side to side horizontally
+ * Represents an enemy that moves up and down vertically.
  */
-public class Enemy_H extends GameObject {
+public class Enemy_H extends ComplexGameObject {
 
-    private int HEIGHT;
-    private int WIDTH;
-    private Ball ball;
     private int health;
     private boolean dead;
     private boolean hit;
@@ -18,12 +17,10 @@ public class Enemy_H extends GameObject {
     private boolean hit_top;
     private boolean hit_bottom;
 
-    public Enemy_H(int x, int y, int width, int height, Ball ball, Color color) {
-        super(x, y, 2, 0, color);
-        this.WIDTH = width;
-        this.HEIGHT = height;
-        makeIntegerCoordinates();
-        this.ball = ball;
+    private SpawnerManager spawnerManager;
+
+    public Enemy_H(double x, double y, double velX, double velY, double width, double height, Color color, String id, SpawnerManager spawnerManager) {
+        super(x, y, velX, velY, height, width, color, id);
         health = 100;
         dead = false;
         hit = false;
@@ -31,166 +28,79 @@ public class Enemy_H extends GameObject {
         hit_left = false;
         hit_top = false;
         hit_bottom = false;
-    }
 
-    public void makeCoordinates() {
-        
-    }
-    
-    public void makeIntegerCoordinates() {
-        xInts = new int[] {x, x, x + 20, x + 20, x + 60, x + 60, x + 80, x + 80};
-        yInts = new int[] {y, y + 100, y + 100, y + 50, y + 50, y + 100, y + 100, y};
-    }
+        this.spawnerManager = spawnerManager;
 
-    public void setXInts(int x0, int x1, int x2, int x3, int x4, int x5, int x6, int x7) {
-        xInts[0] = x0;
-        xInts[1] = x1;
-        xInts[2] = x2;
-        xInts[3] = x3;
-        xInts[4] = x4;
-        xInts[5] = x5;
-        xInts[6] = x6;
-        xInts[7] = x7;
-    }
-
-    public void setYInts(int y0, int y1, int y2, int y3, int y4, int y5, int y6, int y7) {
-        yInts[0] = y0;
-        yInts[1] = y1;
-        yInts[2] = y2;
-        yInts[3] = y3;
-        yInts[4] = y4;
-        yInts[5] = y5;
-        yInts[6] = y6;
-        yInts[7] = y7;
+        makeTimer();
     }
 
     public void tick() {
-        if (hit == true) {
+
+        if (midPoint.x >= 900 || midPoint.x <= 100) {
+            velX *= -1;
+        }
+
+        setX(midPoint.x += velX);
+
+        if (hit) {
             health = health - 25;
             hit = false;
+            System.out.println(health);
         }
 
         if (health <= 0) {
             dead = true;
         }
-
-        xInts[0] += velX;
-        xInts[1] += velX;
-        xInts[2] += velX;
-        xInts[3] += velX;
-        xInts[4] += velX;
-        xInts[5] += velX;
-        xInts[6] += velX;
-        xInts[7] += velX;
-
-        listenForCollision();
     }
 
     public void render(Graphics g) {
-        if (dead == false) {
-            g.setColor(color);
-            g.fillPolygon(xInts, yInts, 8);
-        }
+        g.setColor(color);
+        g.fillPolygon(new int[] {(int) concaveVertices[0].x, (int) concaveVertices[1].x, (int) concaveVertices[2].x, (int) concaveVertices[3].x,
+                (int) concaveVertices[4].x, (int) concaveVertices[5].x}, new int[] {(int) concaveVertices[0].y, (int) concaveVertices[1].y,
+                (int) concaveVertices[2].y, (int) concaveVertices[3].y, (int) concaveVertices[4].y, (int) concaveVertices[5].y }, 6);
 
-        if (hit_right) {
-            g.setColor(Color.RED);
-            g.drawLine(xInts[7], yInts[7], xInts[6], yInts[6]);
-            g.drawLine(xInts[7], yInts[7] + 1, xInts[6], yInts[6] + 1);
-            hit_right = false;
-        }
-
-        if (hit_left) {
-            g.setColor(Color.RED);
-            g.drawLine(xInts[0], yInts[0], xInts[1], yInts[1]);
-            g.drawLine(xInts[0], yInts[0] + 1, xInts[1], yInts[1] + 1);
-            hit_left = false;
-        }
-
-        if (hit_top) {
-            g.setColor(Color.RED);
-            g.drawLine(xInts[0], yInts[0], xInts[7], yInts[7]);
-            g.drawLine(xInts[0], yInts[0] + 1, xInts[7], yInts[7] + 1);
-            hit_top = false;
-        }
-
-        if (hit_bottom) {
-            g.setColor(Color.RED);
-            g.drawLine(xInts[1], yInts[1], xInts[7], yInts[7]);
-            g.drawLine(xInts[1], yInts[1] + 1, xInts[7], yInts[7] + 1);
-            hit_bottom = false;
-        }
-
+        /*g.fillPolygon(new int[] {(int) convexVertices[0].x, (int) convexVertices[1].x, (int) convexVertices[2].x},
+                    new int[] {(int) convexVertices[0].y, (int) convexVertices[1].y, (int) convexVertices[2].y}, 3);*/
     }
 
-    private void listenForCollision() {
-        double[] ball_xInts = ball.getXCoordinates();
-        double[] ball_yInts = ball.getYCoordinates();
+    private void makeTimer() {
+        java.util.Timer t = new java.util.Timer();
+        t.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                spawnerManager.spawnBall(midPoint.x - 10, midPoint.y + 30);
+            }
+        }, 0, 10000);
+    }
 
-        // if this is too far right
-        if (xInts[7] >= 700) {
-            velX *= -1;
-        }
-        // if this is too far left
-        if (xInts[0] <= 90) {
-            velX *= -1;
-        }
+    public void makeConcaveVertices() {
+        concaveVertices = new Point2D.Double[6];
 
-        // if the ball hits the right side
-        if (ball_xInts[0] < this.xInts[0] + WIDTH
-                && ball_xInts[0] > this.xInts[0] + WIDTH - 10
-                && ball_yInts[0] < this.yInts[0] + HEIGHT
-                && ball_yInts[0] > this.yInts[0]) {
-            hit = true;
-            ball_xInts[0] = this.xInts[0] + WIDTH;
-            ball_xInts[1] = this.xInts[1] + WIDTH;
-            ball_xInts[2] = this.xInts[2] + ball.getWidth();
-            ball_xInts[3] = this.xInts[3] + ball.getWidth();
-            ball.setXCoordinates(ball_xInts);
-            ball.setVelX(ball.getVelX() * -1);
-            hit_right = true;
-        }
-        // if the ball hits the left side
-        else if (ball_xInts[2] > this.xInts[0]
-                && ball_xInts[2] < this.xInts[0] + 10
-                && ball_yInts[2] < this.yInts[0] + HEIGHT
-                && ball_yInts[2] > this.yInts[0]) {
-            hit = true;
-            ball_xInts[0] = this.xInts[0];
-            ball_xInts[1] = this.xInts[1];
-            ball_xInts[2] = this.xInts[1] - ball.getWidth();
-            ball_xInts[3] = this.xInts[1] - ball.getWidth();
-            ball.setXCoordinates(ball_xInts);
-            ball.setVelX(ball.getVelX() * -1);
-            hit_left = true;
-        }
-        // if the ball hits the bottom
-        else if (ball_xInts[0] > this.xInts[0]
-                && ball_xInts[0] < this.xInts[0] + WIDTH
-                && ball_yInts[0] < this.yInts[0] + HEIGHT
-                && ball_yInts[0] > this.yInts[0] + HEIGHT - 10) {
-            hit = true;
-            ball_yInts[0] = this.yInts[0] + HEIGHT;
-            ball_yInts[1] = this.yInts[0] + HEIGHT + ball.getHeight();
-            ball_yInts[2] = this.yInts[0] + HEIGHT + ball.getHeight();
-            ball_yInts[3] = this.yInts[0] + HEIGHT;
-            ball.setYCoordinates(ball_yInts);
-            ball.setVelY(ball.getVelY() * -1);
-            hit_bottom = true;
-        }
-        // if the ball hits the top
-        else if (ball_xInts[0] > this.xInts[0]
-                && ball_xInts[0] < this.xInts[0] + WIDTH
-                && ball_yInts[2] > this.yInts[0]
-                && ball_yInts[2] < this.yInts[0] + 10) {
-            hit = true;
-            ball_yInts[0] = this.yInts[0] + ball.getHeight();
-            ball_yInts[1] = this.yInts[0];
-            ball_yInts[2] = this.yInts[0];
-            ball_yInts[3] = this.yInts[0] + ball.getHeight();
-            ball.setYCoordinates(ball_yInts);
-            ball.setVelY(ball.getVelY() * -1);
-            hit_top = true;
-        }
+        Point2D.Double v1 = new Point2D.Double(midPoint.x, midPoint.y - HEIGHT / 2); // tip
+        Point2D.Double v2 = new Point2D.Double(midPoint.x - WIDTH / 2, midPoint.y + HEIGHT / 2); // left foot
+        Point2D.Double v3 = new Point2D.Double(midPoint.x - (WIDTH / 2) + 20, midPoint.y + HEIGHT / 2);
+        Point2D.Double v4 = new Point2D.Double(midPoint.x, midPoint.y - (HEIGHT / 2) + 20); // right under tip
+        Point2D.Double v5 = new Point2D.Double(midPoint.x + (WIDTH / 2) - 20, midPoint.y + HEIGHT / 2); // right foot
+        Point2D.Double v6 = new Point2D.Double(midPoint.x + WIDTH / 2, midPoint.y + HEIGHT / 2);
+
+        concaveVertices[0] = v1;
+        concaveVertices[1] = v2;
+        concaveVertices[2] = v3;
+        concaveVertices[3] = v4;
+        concaveVertices[4] = v5;
+        concaveVertices[5] = v6;
+    }
+
+    public void makeConvexVertices() {
+        convexVertices = new Point2D.Double[3];
+
+        Point2D.Double v1 = new Point2D.Double(midPoint.x, midPoint.y - HEIGHT / 2);
+        Point2D.Double v2 = new Point2D.Double(midPoint.x - WIDTH / 2, midPoint.y + HEIGHT / 2);
+        Point2D.Double v3 = new Point2D.Double(midPoint.x + WIDTH / 2, midPoint.y + HEIGHT / 2);
+
+        convexVertices[0] = v1;
+        convexVertices[1] = v2;
+        convexVertices[2] = v3;
     }
 
     public void resurrect() {
@@ -203,5 +113,9 @@ public class Enemy_H extends GameObject {
 
     public void setHealth(int health) {
         this.health = health;
+    }
+
+    public void setHit(boolean hit) {
+        this.hit = hit;
     }
 }

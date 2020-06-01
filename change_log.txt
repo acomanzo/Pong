@@ -100,7 +100,8 @@ regular pong :p In order to do this I added a "state machine" of sorts in Game.j
 and render() methods accordingly. I also make separate objects for each mode i.e. each mode has its own balls, paddles,
 and so on. I added a new box in the menu screen to reflect this. Also, I made Ball.java take an ArrayList of GameObjects
 so that each ball will know which GameObjects to interact with. I also added new color palettes to the main menu and
-both modes. I also cleaned up my code by removing unused pieces of code and comments. Another big update is in Timer.
+both modes. I also cleaned up my code by removing unused pieces of code and comments.
+Another big update is in Timer.
 I removed the function where when the user pauses the game the timer pauses. This wasn't a perfect function, and
 it's not that important, so I decided to remove it until I can figure out how to make it work how I want it to. Also,
 although there are two timers (one for each mode), they will show the same time in the HUD.
@@ -112,3 +113,33 @@ college for help: I emailed my linear algebra professor to inquire about a matri
 from last semester to get his perspective. My linear professor guided me towards a chapter in my textbook that might
 help and my mechanics professor said the problem is very hard. I have yet to respond to them and haven't thought about
 what they've said very much yet.
+
+4/1/20: After the OOP lecture, I think what I want to do is break up GameObject into 
+Interface and abstract classes. GameObject might be a good interface since it has tick()
+And render() which are public, but I might need like a SimpleGameObject and 
+ComplexGameObject classes.
+
+4/5/20: Researched the separated axis theorem for collision detection and it works a lot 
+better. Just need to tweak it a bit because the ball will not reflect off player1 in
+Crazy mode. Also, SAT does not produce accurate results for concave shapes, so need to 
+Re write the enemies so that the collision manager treats them like convex shapes.
+
+4/6/20: Maybe implement a feature where after the ball collides with an object, it cannot collide with the same object until one second has passed? 
+
+4/10/20: Alrighty so as of today the collision detection and SAT collision resolution is working. It's only kind of robust though, so maybe it could be improved. Right now I'm putting on the finishing touches by fixing Enemy_H and Enemy_V. I am trying to get H working first. I need to figure out how to spawn the ball every 10 seconds. Also, now that the crazy mode is getting much different from the classic mode, it is getting difficult to manage both with the same code. I need to find out if there's a way I can have two packages or something for each mode and then a package handler that still lets the player
+Seamlessly switch between the two and will pause one. I also have an issue where adding the Trail into the handler makes bad things happen... so I wonder if the solution is to put a mutex lock on accessing the LinkedHashMap inside the handler?
+
+5/31/20: I think I will have to remove the trail for now. It is opening up a can of threading worms that I do not want
+to deal with. You get a ConcurrentModificationException; and fortunately the trail is not a crucial element of the game.
+ I made some refactoring changes. I made it so that ComplexGameObject extends SimpleGameObject which makes it much
+ easier to use the two types in the collision manager since it lets me re use code. Next I fixed Enemy_V so that it
+ will render. Also, since the ball is so complex, I should either simplify it or make a new object like the ball for
+ the enemies to shoot. I think I will go with the latter decision because it will be easier. I think the former would
+ require a lot of editing and refactoring and I kind of want this project to be done.
+
+ 6/1/20: Finished it but in a really cheezy way. My code kept breaking itself so I did a bit of a shotty job. Onto the
+ next project though. This is what happens when you don't know anything about software engineering. After taking
+ my principles of programming languages class and coming back to this I'm like "wtf was I thinking..." stuff is not
+ as abstract as it should be. Classes are doing too many things at once. But I have a vision of what I wanted: the
+ enemies shoot balls and then you hit the enemies with the balls. THe collision is kinda cool because the balls will
+ bounce off each other which I wasn't expecting.
